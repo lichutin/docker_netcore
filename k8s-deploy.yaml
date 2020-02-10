@@ -1,0 +1,59 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: firstdotnet
+  namespace: default
+  selfLink: /apis/apps/v1/namespaces/default/deployments/firstdotnet
+  generation: 2
+  labels:
+    k8s-app: firstdotnet
+  annotations:
+    deployment.kubernetes.io/revision: '1'
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      k8s-app: firstdotnet
+  template:
+    metadata:
+      name: firstdotnet
+      creationTimestamp: null
+      labels:
+        k8s-app: firstdotnet
+    spec:
+      containers:
+        - name: firstdotnet
+          image: 'localhost:5000/lichutinmodul/firstdotnet'
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+          securityContext:
+            privileged: false
+          readinessProbe: # способно ли приложение сейчас обрабатывать запросы
+            httpGet:
+              path: /readness/check
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:  # живо ли приложение в принципе
+            httpGet:
+              path: /liveness/check
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          env:
+          - name: REMOTE_ENDPOINT
+            value: "test"
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
