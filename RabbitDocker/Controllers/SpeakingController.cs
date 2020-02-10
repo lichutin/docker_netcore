@@ -28,7 +28,7 @@ namespace RabbitDocker.Controllers
             var number = await client.GetStringAsync(numberUri);
 
             var stringUri = variableValue + "/generation/getstring";
-            var @string = await client.GetStringAsync(numberUri);
+            var @string = await client.GetStringAsync(stringUri);
 
             return @string + number;
         }
